@@ -5,7 +5,7 @@ from scipy.optimize import curve_fit
 from scipy import interpolate
 import matplotlib
 
-font = {'family' : 'normal',
+font = {'family' : 'serif',
         'weight' : 'normal',
         'size'   : 22}
 
@@ -50,13 +50,16 @@ def sanitize_data(df, x_lim = None, y_lim = None, z_lim = None, swap_x_y = False
 
 ##
 # process a particular dataset
-dset = "2025-01-25--16-21-25"
+dset = "2025-01-25--16-21-25" # data set 1
+# dset = "2025-01-25--16-25-07" # data set 2
 
 t = 140
-swap_x_y = False
+swap_x_y = True
 data = read_ply_data(f'./data/{dset}/PLY/', t)
-x,y,z = sanitize_data(data, y_lim=[25, 50], z_lim=[-100, -40])
+x,y,z = sanitize_data(data, y_lim=[25, 50], z_lim=[-100, -40], swap_x_y=swap_x_y) # use for data set 1
+# x,y,z = sanitize_data(data, y_lim=[6, 35], swap_x_y=swap_x_y) # use for data set 2
 
+print('read data')
 
 
 
@@ -90,6 +93,7 @@ ax.set_xlabel("x (cm)")
 ax.set_ylabel("y (cm)")
 ax.set_zlabel("z (cm)")
 plt.axis('equal')
+plt.show()
 
 
 
@@ -107,8 +111,6 @@ def plane(xy, a, b, c):
 popt, pcov = curve_fit(plane, (x,y), z, p0=(0,0,0))
 z_plane = plane((x,y), *popt)
 z = z - z_plane
-print(popt)
-
 
 
 ##
@@ -117,8 +119,10 @@ Nx = 100 # number of quadrature points in x
 Ny = 100 # number of quadrature points in x
 x_reg = np.linspace(x_raw.min(), x_raw.max(), Nx)
 y_reg = np.linspace(y_raw.min(), y_raw.max(), Ny)
-spline_interp = interpolate.bisplrep(x, y, z)
 xx, yy = np.meshgrid(x_reg, y_reg)
+
+# if regular spaced points are needed, use the following.
+# spline_interp = interpolate.bisplrep(x, y, z)
 # zz_interpolated = interpolate.bisplev(x_reg, y_reg, spline_interp)
 
 
@@ -166,10 +170,19 @@ def two_gaussians(xy,
   return gaussian(xy, a1,x01,y01,sx1,sy1) + gaussian(xy, a2, x02, y02, sx2, sy2)
 
 
+print("fitting guassians")
 popt, pcov = curve_fit(two_gaussians, (x, y), z,
                        p0=(1, x.min(), y.min()/2, (x.max()-x.min())/3, (y.max()-y.min())/3,
                            1, x.max(), y.min()/2, (x.max()-x.min())/3, (y.max()-y.min())/3)
                        )
+
+
+
+
+
+
+
+
 ##
 # plot gaussian fit in 3d
 fig = plt.figure()
