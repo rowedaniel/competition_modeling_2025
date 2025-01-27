@@ -53,7 +53,7 @@ def sanitize_data(df, x_lim = None, y_lim = None, z_lim = None, swap_x_y = False
 dset = "2025-01-25--16-21-25" # data set 1
 # dset = "2025-01-25--16-25-07" # data set 2
 
-t = 140
+t = 20
 swap_x_y = True
 data = read_ply_data(f'./data/{dset}/PLY/', t)
 x,y,z = sanitize_data(data, y_lim=[25, 50], z_lim=[-100, -40], swap_x_y=swap_x_y) # use for data set 1
